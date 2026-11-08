@@ -1,11 +1,9 @@
 AnimateMate Plugin For Sketch
 =============================
 
-```diff
-- AnimateMate project is deprecated
-- Unfortunately I don't have time to update the AnimateMate plugin anymore. 
-- If you create updates, please do send me pull requests and I'll update it to the master.
-```
+> **Maintained fork.** The original [Creatide/AnimateMate](https://github.com/Creatide/AnimateMate) is archived.
+> This fork keeps the plugin working on current Sketch (tested on Sketch 2026.3.1, Apple Silicon).
+> See [Changes in this fork](#changes-in-this-fork).
 
 #### "Create your animations directly in Sketch using AnimateMate."
 
@@ -35,6 +33,29 @@ Copy **`AnimateMate.sketchplugin`** to **Sketch** plugins folder.
 
 > Easiest way to go into your Sketch plugin folder:<br>
 **Plugins > Manage Plugins > Reveal Plugins Folder**
+
+GIF export needs [Gifsicle](https://www.lcdf.org/gifsicle/) installed on your system
+(it is no longer bundled with the plugin):
+
+```bash
+brew install gifsicle
+```
+
+The plugin looks for it in `/opt/homebrew/bin`, `/usr/local/bin` and `/opt/local/bin`.
+PNG sequence export works without it.
+
+
+## Changes in this fork
+
+- **Loads on Apple Silicon.** The bundled Intel-only `gifsicle` binary made Sketch reject the
+  whole plugin ("not compatible with your computer's CPU architecture"). It was removed; the
+  system install is used instead.
+- **Works with Sketch artboards-as-frames.** `MSPage.currentArtboard()` and `MSArtboardGroup`
+  no longer exist and artboards are now `MSLayerGroup`s. The active artboard is resolved from
+  the selection (or the only artboard on the page), and artboards are told apart from groups
+  via `page.artboards()`.
+- **Year-based Sketch versions.** The Sketch version is parsed as a number, so checks like
+  `>= 41` work again with versions such as `2026.3.1`.
 
 
 ## How to Use
