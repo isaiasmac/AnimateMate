@@ -8,7 +8,8 @@ function Utils() {
     // General values
     this.scriptName = 'AnimateMate';
     this.pluginDomain = "com.creatide.sketch.animatemate";
-    this.sketchVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:"CFBundleShortVersionString"];
+    // Numeric so comparisons like `>= 41` work with year-based versions (e.g. "2026.3.1" -> 2026.3)
+    this.sketchVersion = parseFloat(String([[NSBundle mainBundle] objectForInfoDictionaryKey:"CFBundleShortVersionString"]));
     this.scriptPath = null;
     this.scriptPathRoot = null;
     this.scriptResourcesPath = null;
@@ -33,7 +34,7 @@ Utils.prototype.init = function (context, loopNestedGroups, forceContinue) {
     this.doc = context.document;
     this.selection = context.selection;
     this.page = this.doc.currentPage();
-    this.artboard = this.page.currentArtboard();
+    this.artboard = this.resolveArtboard(this.selection, this.page);
     this.allLayersActive = false;
 
     if (this.artboard) {
@@ -51,7 +52,7 @@ Utils.prototype.init = function (context, loopNestedGroups, forceContinue) {
         if (this.selection.count() > 0) {
             this.layers = this.selection;
             // If artboard is selected use all layers from that
-            if (this.selection.firstObject().isMemberOfClass(MSArtboardGroup)) {
+            if (this.isArtboard(this.selection.firstObject())) {
                 this.layers = this.artboard.layers();
                 this.allLayersActive = true;
             }
@@ -84,6 +85,38 @@ Utils.prototype.init = function (context, loopNestedGroups, forceContinue) {
         dialog.createDialogMessage(1);
         return false;
     }
+};
+
+
+// ---------------------------------------- //
+//          Artboard / group helpers        //
+// ---------------------------------------- //
+
+// Since Sketch 2025 artboards are frames: MSArtboardGroup and
+// MSPage.currentArtboard() no longer exist and artboards are plain
+// MSLayerGroup instances. An artboard is a layer listed in page.artboards().
+Utils.prototype.isArtboard = function (layer) {
+    if (!layer || !this.page) return false;
+    return !!this.page.artboards().containsObject(layer);
+};
+
+// A group that is not an artboard (artboards are MSLayerGroup too now)
+Utils.prototype.isGroup = function (layer) {
+    return !!(layer && layer.isMemberOfClass(MSLayerGroup) && !this.isArtboard(layer));
+};
+
+// Replacement for the removed MSPage.currentArtboard()
+Utils.prototype.resolveArtboard = function (selection, page) {
+    if (selection && selection.count() > 0) {
+        var first = selection.firstObject();
+        if (this.isArtboard(first)) return first;
+        var parentArtboard = first.parentArtboard();
+        if (parentArtboard) return parentArtboard;
+    }
+    // Nothing selected: use the only artboard on the page, if there is just one
+    var artboards = page.artboards();
+    if (artboards.count() == 1) return artboards.firstObject();
+    return null;
 };
 
 

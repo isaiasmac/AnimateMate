@@ -495,7 +495,7 @@ Animate.prototype.getLayers = function (layers, loopNestedGroups) {
             var refLayer = layers.objectAtIndex(i);
             var layerID = NSProcessInfo.processInfo().globallyUniqueString();
             
-            if (refLayer.isMemberOfClass(MSLayerGroup)) {
+            if (utils.isGroup(refLayer)) {
                 callback(refLayer);
                 parseLayerName(refLayer, layerID);
                 if (loopNestedGroups) loopLayers(refLayer.layers(), callback);
@@ -566,8 +566,14 @@ Animate.prototype.saveImageGIF = function (pngFilesLocation, loopValue, delayVal
     var gifExportName = this.exportName + '_' + this.startFrameNumber + '-' + this.endFrameNumber;
     
     // Gifsicle Manual: http://www.lcdf.org/gifsicle/man.html
-    var gifConverter = utils.scriptLibraryPath + "/gifsicle";
-    
+    // Gifsicle is no longer bundled (an Intel-only binary inside the plugin makes
+    // Sketch refuse to load it on Apple Silicon). Use the system install instead.
+    var gifConverter = this.findGifsicle();
+    if (!gifConverter) {
+        dialog.createBottomMessage(4, 'Gifsicle not found. Install it with: brew install gifsicle');
+        return;
+    }
+
     // Create settings for conversion process
     var convertTask = NSTask.alloc().init();
     var createTask = NSTask.alloc().init();
@@ -653,6 +659,23 @@ Animate.prototype.createExportFolders = function () {
 // ---------------------------------------- //
 //                  Helpers                 //
 // ---------------------------------------- //
+
+
+Animate.prototype.findGifsicle = function () {
+    var fileManager = NSFileManager.defaultManager();
+    var candidates = [
+        '/opt/homebrew/bin/gifsicle',
+        '/usr/local/bin/gifsicle',
+        '/opt/local/bin/gifsicle',
+        utils.scriptLibraryPath + '/gifsicle'
+    ];
+    for (var i = 0; i < candidates.length; i++) {
+        if (fileManager.isExecutableFileAtPath(candidates[i])) {
+            return candidates[i];
+        }
+    }
+    return null;
+};
 
 
 Animate.prototype.searchDuplicateKeyframe = function (layer, searchNumber) {

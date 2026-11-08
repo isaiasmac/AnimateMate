@@ -150,10 +150,10 @@ Animation.prototype.searchDuplicateKeyframes = function (keyframeNumber) {
 
 
 Animation.prototype.setLayerType = function () {
-    if (this.layer.isMemberOfClass(MSLayerGroup)) {
-        return 'group';
-    } else if (this.layer.isMemberOfClass(MSArtboardGroup)) {
+    if (utils.isArtboard(this.layer)) {
         return 'artboard';
+    } else if (utils.isGroup(this.layer)) {
+        return 'group';
     } else {
         return 'layer';
     }
@@ -165,7 +165,7 @@ Animation.prototype.getLayerLevel = function () {
     var parent = this.layer.parentGroup();
     var levelNum = 0;
     
-    while (parent.isMemberOfClass(MSLayerGroup)) {
+    while (utils.isGroup(parent)) {
         levelNum++;
         parent = parent.parentGroup();
     }
@@ -180,10 +180,10 @@ Animation.prototype.getParentGroups = function (layer) {
     var parentGroups = [];
     
     var parentLoop = function (parent) {
-        if (parent.isMemberOfClass(MSLayerGroup)) {
+        if (utils.isGroup(parent)) {
             parentGroups.push(parent)
             parentLoop(parent.parentGroup());
-        } else if (parent.isMemberOfClass(MSArtboardGroup)) {
+        } else if (utils.isArtboard(parent)) {
             parents.artboard = parent;
         }
     }
