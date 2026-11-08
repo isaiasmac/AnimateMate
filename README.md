@@ -61,6 +61,16 @@ PNG sequence export works without it.
   via `page.artboards()`.
 - **Year-based Sketch versions.** The Sketch version is parsed as a number, so checks like
   `>= 41` work again with versions such as `2026.3.1`.
+- **Export scale works again.** PNG frames (and the GIF made from them) are rendered at the
+  scale set in the Export dialog, e.g. `2` for @2x.
+- **Safer GIF export.** `sips` and `gifsicle` are run directly with argument lists instead of
+  through a shell, so export names and folders with spaces, quotes or apostrophes work.
+- **Layers are always restored.** If rendering fails midway, layers go back to their original
+  position, size, rotation and opacity instead of staying on the last rendered frame.
+- **Cleaner export.** No temporary folder is left behind when the export folder dialog is
+  canceled, the GIF file name uses the rendered frame range, and a message confirms PNG-only
+  exports.
+- **Test harness for development** in [`dev/`](dev/README.md).
 
 
 ## How to Use
@@ -112,7 +122,7 @@ Here are a couple examples that are made using **AnimateMate** plugin in **Sketc
 
 ## Known Bugs to Fix
 
-* [ ] Export scaling option doesn't work after Sketch 41 version.
+* [x] Export scaling option doesn't work after Sketch 41 version.
 
 ## Roadmap & Feature Ideas
 

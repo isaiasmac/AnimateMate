@@ -1,0 +1,24 @@
+{
+  "name": "AMTestHarness",
+  "description": "Development-only helper for testing AnimateMate. Not part of the plugin.",
+  "identifier": "local.animatemate.testharness",
+  "version": "0.1.0",
+  "compatibleVersion": "70",
+  "bundleVersion": 1,
+  "commands": [
+    { "name": "Setup", "identifier": "setup", "script": "harness.js", "handler": "setup" },
+    { "name": "Inspect", "identifier": "inspect", "script": "harness.js", "handler": "inspect" },
+    { "name": "Probe", "identifier": "probe", "script": "harness.js", "handler": "probe" },
+    { "name": "Select A", "identifier": "selectA", "script": "harness.js", "handler": "selectA" },
+    { "name": "Select None", "identifier": "selectNone", "script": "harness.js", "handler": "selectNone" },
+    { "name": "Mutate", "identifier": "mutate", "script": "harness.js", "handler": "mutate" },
+    { "name": "Setup Group", "identifier": "setupGroup", "script": "harness.js", "handler": "setupGroup" },
+    { "name": "Mutate C", "identifier": "mutateC", "script": "harness.js", "handler": "mutateC" },
+    { "name": "Animate A", "identifier": "animateA", "script": "harness.js", "handler": "animateA" },
+    { "name": "Export Test", "identifier": "exportTest", "script": "harness.js", "handler": "exportTest" }
+  ],
+  "menu": {
+    "title": "AMTestHarness",
+    "items": ["setup", "inspect", "probe", "selectA", "selectNone", "mutate", "setupGroup", "mutateC", "animateA", "exportTest"]
+  }
+}

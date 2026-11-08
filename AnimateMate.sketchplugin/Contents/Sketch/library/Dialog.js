@@ -235,7 +235,23 @@ Dialog.prototype.exportAnimation = function () {
             // Save new default values
             dialog.defaultValues(elements, response[1], undefined);
 
-            animate.exportAnimation(response[1][2].value, response[1][0].value, response[1][1].value, response[1][3].value, response[1][4].value, response[1][6].value, response[1][7].value, response[1][8].value, response[1][5].value, response[1][11].value, response[1][9].value, response[1][10].value);
+            // Response order follows the dialog layout above:
+            // 0 GIF, 1 PNG, 2 name, 3 start, 4 end, 5 scale, 6 anchor,
+            // 7 delay, 8 loop, 9 optimize, 10 colors, 11 dither
+            animate.exportAnimation(
+                response[1][2].value,   // exportName
+                response[1][0].value,   // exportGif
+                response[1][1].value,   // exportPng
+                response[1][3].value,   // renderStartFrame
+                response[1][4].value,   // renderEndFrame
+                response[1][6].value,   // referencePoint
+                response[1][7].value,   // gifDelay
+                response[1][8].value,   // gifLoop
+                response[1][5].value,   // scaleValue
+                response[1][11].value,  // gifDither
+                response[1][9].value,   // gifOptimize
+                response[1][10].value   // gifColors
+            );
             
         } else if (response[0] == 1002) {
             dialog.defaultValues(elements, undefined, elementsDefaults[1]);
@@ -1303,6 +1319,11 @@ Dialog.prototype.createBottomMessage = function (messageId, optionalMessage) {
     case 5:
         gui.createInfoMessage("Keyframe Selected:" + optionalMessage );
         log(utils.scriptName + "Keyframe Selected:" + optionalMessage );
+        break;
+
+    case 6:
+        gui.createInfoMessage("PNG sequence exported to: " + optionalMessage);
+        log(utils.scriptName + " exported PNG sequence (" + optionalMessage + ")");
         break;
     }
 };
