@@ -1,13 +1,18 @@
 AnimateMate Plugin For Sketch
 =============================
 
-> **Maintained fork.** The original [Creatide/AnimateMate](https://github.com/Creatide/AnimateMate) is archived.
-> This fork keeps the plugin working on current Sketch (tested on Sketch 2026.3.1, Apple Silicon).
+> **This is a fork.** AnimateMate was created by [Creatide](http://creatide.com) (Sakari Niittymaa)
+> in [Creatide/AnimateMate](https://github.com/Creatide/AnimateMate), which is no longer maintained and is archived.
+> This fork, maintained by [@isaiasmac](https://github.com/isaiasmac), keeps the plugin working on current Sketch
+> (tested on Sketch 2026.3.1, Apple Silicon). All credit for the original plugin goes to its author.
 > See [Changes in this fork](#changes-in-this-fork).
+>
+> Please report issues and send pull requests to [isaiasmac/AnimateMate](https://github.com/isaiasmac/AnimateMate),
+> not to the original repository.
 
 #### "Create your animations directly in Sketch using AnimateMate."
 
-![AnimateMate - Logo Animation](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_LogoAnimation_GitHub.gif)
+![AnimateMate - Logo Animation](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_LogoAnimation_GitHub.gif)
 
 <br><br>
 
@@ -17,14 +22,14 @@ You know feeling when you just need a simple animation for your awesome concept 
 
 <br>
 
-![AnimateMate - Slider Example](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_Slider_0-135.gif)
+![AnimateMate - Slider Example](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_Slider_0-135.gif)
 
 ##### *I Know the Feeling!*
 
 That's why I created AnimateMate in order to produce and export simple animations straight out of Sketch. It's not exactly rocket science, but it can lighten your workflow in some cases. 
 So let the game begin!
 
-![AnimateMate - Game Example](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_PingPong_0-100.gif)
+![AnimateMate - Game Example](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_PingPong_0-100.gif)
 
 
 ## Install
@@ -63,7 +68,7 @@ PNG sequence export works without it.
 There are tons of ways to use **AnimateMate** and I'll try to explain basics in this video.
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=bDm_c4wPBkc
-" target="_blank"><img src="https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Basics_Video_YouTube_Thumbnail.png" 
+" target="_blank"><img src="https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Basics_Video_YouTube_Thumbnail.png" 
 alt="AnimateMate Basics" /></a>
 
 You could run into a situation when you're wondering why it's working this or that way... This plugin does not convert your **Sketch** to a fully featured animation software :) However, it'll help you in many simple cases, but if you need more complex animations you should consider some other animation tools. **AnimateMate** was made for creating simple animations at least for now, we'll see how it'll develop in the future...
@@ -84,25 +89,25 @@ Command               | Shortcut                              | Description
 
 ## Examples
 
-Here are a couple examples that are made using **AnimateMate** plugin in **Sketch**. You'll find more info and examples in the [AnimateMate.com](http://animatemate.com) web pages.
+Here are a couple examples that are made using **AnimateMate** plugin in **Sketch**. The original author's site, [AnimateMate.com](http://animatemate.com), had more info and examples.
 
-![Example 1](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_001.gif)
+![Example 1](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_001.gif)
 
-![Example 2](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_002.gif)
+![Example 2](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_002.gif)
 
-![Example 3](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_003_RandomAnimation.gif)
+![Example 3](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_003_RandomAnimation.gif)
 
-![Example 4](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_004_RandomAnimation.gif)
+![Example 4](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_004_RandomAnimation.gif)
 
-![Example 5](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_005_MaskAnimation.gif)
+![Example 5](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_005_MaskAnimation.gif)
 
-![Example 6](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_006_Over2kItemCountRenderTest.gif)
+![Example 6](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_006_Over2kItemCountRenderTest.gif)
 
-![Example 7](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_007_ManyItemsCountRenderTest.gif)
+![Example 7](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_007_ManyItemsCountRenderTest.gif)
 
-![Example 8](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_008_LoadingIndicators.gif)
+![Example 8](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_008_LoadingIndicators.gif)
 
-![Example 9](https://github.com/Creatide/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_CassetteDemo.gif)
+![Example 9](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_CassetteDemo.gif)
 
 
 ## Known Bugs to Fix
@@ -124,13 +129,10 @@ Here are a couple examples that are made using **AnimateMate** plugin in **Sketc
 * [x] More options to GIF exporting
 
 
-## Colloboration & Feedback
+## Collaboration & Feedback
 
-If you fork AnimateMate and create some useful updates, please do send me pull requests so I can include your work to AnimateMate and give you credit here!
-
-There is so much to do in order to make it better! Collaboration is very welcome and all feedback is greatly appreciated [hello@creatide.com](mailto:hello@creatide.com)
-
-> I'm a Visual Designer and a hobbyist coder. So if you're a more experienced with code, I know we can make it even better :)
+Issues and pull requests are welcome in this fork: [isaiasmac/AnimateMate](https://github.com/isaiasmac/AnimateMate/issues).
+The original repository is archived and no longer accepts contributions.
 
 
 ## About
@@ -141,7 +143,10 @@ I think most of the graphical design sofwares should include at least some very 
 
 ### Author
 
-**AnimateMate** made by [Creatide](http://creatide.com) *([Sakari Niittymaa](http://sakari.niittymaa.com))*
+**AnimateMate** was originally made by [Creatide](http://creatide.com) *([Sakari Niittymaa](http://sakari.niittymaa.com))*.
+The text in this section and in [About](#about) is the original author's.
+
+This fork is maintained by [@isaiasmac](https://github.com/isaiasmac).
 
 > Creatide is not a company nor a big factory. It's a single Designer who also loves coding and improving workflow. I create tools for my personal usage in order to relieve my design process, so every tool is used by myself. Some of those tools end up being released to the public under this name and domain.
 
@@ -156,7 +161,8 @@ Thank you all for your contributions. Special thanks to these people for writing
 ### Licence
 
 The MIT License (MIT)
-Copyright (c) 2017 [Creatide](http://creatide.com) *([Sakari Niittymaa](http://sakari.niittymaa.com))*
+Copyright (c) 2017 [Creatide](http://creatide.com) *([Sakari Niittymaa](http://sakari.niittymaa.com))*<br>
+Fork changes Copyright (c) 2026 [isaiasmac](https://github.com/isaiasmac)
 
 ### Used Libraries & Tools
 
