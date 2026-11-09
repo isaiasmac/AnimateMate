@@ -43,7 +43,7 @@ Animate.prototype.init = function (layers, loopNestedGroups) {
 // ---------------------------------------- //
 
 
-Animate.prototype.exportAnimation = function (exportName, exportGif, exportPng, renderStartFrame, renderEndFrame, referencePoint, loopAnimation, delayAnimation, scaleValue, gifDither, gifOptimize, gifColors) {
+Animate.prototype.exportAnimation = function (exportName, exportGif, exportPng, renderStartFrame, renderEndFrame, referencePoint, gifDelay, gifLoop, scaleValue, gifDither, gifOptimize, gifColors, exportPath) {
     
     // Set base name for exported items
     this.exportName = exportName || this.exportName;
@@ -51,76 +51,94 @@ Animate.prototype.exportAnimation = function (exportName, exportGif, exportPng, 
     // Set render range values
     var renderStartFrame = parseInt(renderStartFrame);
     var renderEndFrame = parseInt(renderEndFrame);
-    if (renderEndFrame > this.endFrameNumber || renderEndFrame < this.startFrameNumber) renderEndFrame = this.endFrameNumber;
-    if (renderStartFrame < 0 || renderStartFrame > renderEndFrame) renderStartFrame = 0;
-    this.startFrameNumber = renderStartFrame;    
+    if (isNaN(renderEndFrame) || renderEndFrame > this.endFrameNumber || renderEndFrame < this.startFrameNumber) renderEndFrame = this.endFrameNumber;
+    if (isNaN(renderStartFrame) || renderStartFrame < 0 || renderStartFrame > renderEndFrame) renderStartFrame = 0;
+    this.startFrameNumber = renderStartFrame;
+    this.renderEndFrame = renderEndFrame;
     
     // Get number of digits from animation length for zero paddings. Add needed zero digits even the number is below 10 e.g. 01, 02, 03...
     var digitsCount = parseInt((this.endFrameNumber.toString()).length);
     var digitsNumber = digitsCount < 2 ? digitsCount + 1 : digitsCount;
     
-    // Setup folder for animation
-    this.createExportFolders();
-    // Test if folders is not empty
-    if (!this.exportFolders.tempFolder || !this.exportFolders.exportFolder) return;
+    // Set scale value to default if it's wrongly typed
+    var scale = parseFloat(scaleValue);
+    if (isNaN(scale) || scale <= 0) scale = 1;
+    
+    // Setup folders for animation (asks for the export folder unless exportPath is given)
+    this.createExportFolders(exportPath);
+    if (!this.exportFolders.exportFolder || !this.exportFolders.tempFolder) {
+        this.removeTempFolder();
+        return;
+    }
     
     // Store location of png files
     var pngFilesLocation = exportPng == 0 ? this.exportFolders.tempFolder.folderPath : this.exportFolders.exportFolder.folderPath;
+    var pngFiles = [];
+    var renderError = null;
     
     // Start timer and show bottom message about starting rendering process
     if (debugLog) dialog.createBottomMessage(1, utils.benchmarkTime.start());
     
-    // Calculate all keyframes and update values to object variable
-    for (var j in this.animationLayers) {
-        this.animationLayers[j].createAllKeyframes();
-    }
-    
-    var animationLayersLength = this.animationLayers.length;
-    
-    // Sort by layer level value (from most deepest to root)
-    this.animationLayers.sort(utils.sortBy('layerLevel', true, parseInt));    
-    
-    // Log preprocessing render time
-    if (debugLog) dialog.createLogMessage(1, ['pre-processing', utils.benchmarkTime.interval()]);
-    
-    // Loop animation frame through all frames in selected range
-    for (var k = this.startFrameNumber; k <= renderEndFrame; k++) {   
-        
-        // Loop all animation layers and apply values to layer
-        for (var i = 0; i < animationLayersLength; i++) {
-            
-            var refLayer = this.animationLayers[i];
-            
-            // Check that keyframe exist or it will crash with different length of animations
-            if (refLayer.allKeyframes[k]) {
-                refLayer.setOriginalValues(refLayer.allKeyframes[k], k, referencePoint);
-            }
+    try {
+        // Calculate all keyframes and update values to object variable
+        for (var j in this.animationLayers) {
+            this.animationLayers[j].createAllKeyframes();
         }
         
-        // Set scale value to default if it's wrongly typed
-        var scaleValue = utils.isNumeric(scaleValue) && scaleValue > 0 ? scaleValue : 1;
+        var animationLayersLength = this.animationLayers.length;
         
-        // Save PNG base images to selected location
-        this.saveImagePNG(utils.zeroPadding(k, digitsNumber), pngFilesLocation, scaleValue);
+        // Sort by layer level value (from most deepest to root)
+        this.animationLayers.sort(utils.sortBy('layerLevel', true, parseInt));
         
-        // Log frame render time
-        if (debugLog) dialog.createLogMessage(1, [utils.zeroPadding(k, digitsNumber), utils.benchmarkTime.interval()]);
+        // Log preprocessing render time
+        if (debugLog) dialog.createLogMessage(1, ['pre-processing', utils.benchmarkTime.interval()]);
+        
+        // Loop animation frame through all frames in selected range
+        for (var k = this.startFrameNumber; k <= renderEndFrame; k++) {
+            
+            // Loop all animation layers and apply values to layer
+            for (var i = 0; i < animationLayersLength; i++) {
+                
+                var refLayer = this.animationLayers[i];
+                
+                // Check that keyframe exist or it will crash with different length of animations
+                if (refLayer.allKeyframes[k]) {
+                    refLayer.setOriginalValues(refLayer.allKeyframes[k], k, referencePoint);
+                }
+            }
+            
+            // Save PNG base images to selected location
+            pngFiles.push(this.saveImagePNG(utils.zeroPadding(k, digitsNumber), pngFilesLocation, scale));
+            
+            // Log frame render time
+            if (debugLog) dialog.createLogMessage(1, [utils.zeroPadding(k, digitsNumber), utils.benchmarkTime.interval()]);
+        }
+    } catch (error) {
+        renderError = error;
+    } finally {
+        // Always put layers back to their original values, even if rendering failed
+        for (var l in this.animationLayers) {
+            this.animationLayers[l].setOriginalValues();
+        }
     }
     
-    // Set layer original values back
-    for (var l in this.animationLayers) {
-        this.animationLayers[l].setOriginalValues();
+    if (renderError) {
+        this.removeTempFolder();
+        dialog.createBottomMessage(4, 'Rendering failed: ' + renderError);
+        return;
     }
     
     // Export / Create GIF animation from PNG images
-    if (exportGif != 0 && this.exportFolders.tempFolder) {
+    if (exportGif != 0) {
         // Log GIF starting message
         if (debugLog) dialog.createLogMessage(2);
-        this.saveImageGIF(pngFilesLocation, delayAnimation, loopAnimation, gifDither, gifOptimize, gifColors);
+        this.saveImageGIF(pngFiles, gifDelay, gifLoop, gifDither, gifOptimize, gifColors);
+    } else {
+        dialog.createBottomMessage(6, this.exportFolders.exportFolder.folderPath);
     }
     
     // Remove temporary folder
-    this.exportFolders.tempFolder.fileManager.removeItemAtPath_error_(this.exportFolders.tempFolder.folderPath, null);
+    this.removeTempFolder();
     
     // Show bottom message about starting rendering process
     if (debugLog) dialog.createBottomMessage(2, utils.benchmarkTime.stop());
@@ -515,55 +533,34 @@ Animate.prototype.getLayers = function (layers, loopNestedGroups) {
 // ---------------------------------------- //
 
 
-Animate.prototype.saveImagePNG = function (keyframeNumber, exportFolder, scaleValue) {
-    var exportFolder = exportFolder || this.exportFolders.tempFolder.folderPath;
-    var fileName = exportFolder.stringByAppendingPathComponent(this.exportName + '_' + keyframeNumber + '.png');
+Animate.prototype.saveImagePNG = function (frameLabel, exportFolder, scaleValue) {
+    var exportFolder = NSString.stringWithString(exportFolder || this.exportFolders.tempFolder.folderPath);
+    var fileName = exportFolder.stringByAppendingPathComponent(this.exportName + '_' + frameLabel + '.png');
+    var scale = scaleValue > 0 ? scaleValue : 1;
+    
     if (utils.sketchVersion >= 41) {
-        utils.doc.saveArtboardOrSlice_toFile_(utils.artboard, fileName);
+        // The JS API honours the export scale; saveArtboardOrSlice always renders at 1x
+        var sketchApi = require('sketch');
+        var data = sketchApi.export(sketchApi.fromNative(utils.artboard), {
+            formats: 'png',
+            scales: String(scale),
+            output: false
+        });
+        if (!data.toNSData().writeToFile_atomically(fileName, true)) {
+            throw new Error('Could not write ' + fileName);
+        }
     } 
     else {
         // Work only with sketch < 41 version
-        var scaleSlice = [MSExportRequest requestWithRect:utils.artboardRect scale:scaleValue];
+        var scaleSlice = [MSExportRequest requestWithRect:utils.artboardRect scale:scale];
         utils.doc.saveArtboardOrSlice_toFile_(scaleSlice, fileName);
     }
+    
+    return String(fileName);
 };
 
 
-Animate.prototype.saveImageGIF = function (pngFilesLocation, loopValue, delayValue, gifDither, gifOptimizeLevel, gifColors) {
-    
-    var loop = ' -l';
-    var loopValue = parseInt(loopValue);
-    var colorsValue = parseInt(gifColors);
-    var dither = parseInt(gifDither) ? ' --dither' : '';
-    
-    // Colors between 2-256 value
-    colorsValue = colorsValue >= 2 && colorsValue <= 256 ? ' --colors=' + colorsValue : '';
-    
-    // Switch optimize levels
-    var optimize = '';
-    switch (parseInt(gifOptimizeLevel)) {
-        case 1:
-            optimize = ' -O1';
-            break;
-        case 2:
-            optimize = ' -O2';
-            break;
-        case 3:
-            optimize = ' -O3';
-            break;
-    }
-    
-    // Prevent Gifsicle one extra loop round
-    if (loopValue && !isNaN(loopValue)) {
-        if (loopValue === 1) {
-            loop = ' --no-loopcount';
-        } else {
-            loop = ' -l' + (loopValue - 1);
-        }
-    }
-    
-    var delay = parseFloat(delayValue) ? ' -d' + parseFloat(delayValue) : ' -d0';
-    var gifExportName = this.exportName + '_' + this.startFrameNumber + '-' + this.endFrameNumber;
+Animate.prototype.saveImageGIF = function (pngFiles, delayValue, loopValue, gifDither, gifOptimizeLevel, gifColors) {
     
     // Gifsicle Manual: http://www.lcdf.org/gifsicle/man.html
     // Gifsicle is no longer bundled (an Intel-only binary inside the plugin makes
@@ -571,63 +568,82 @@ Animate.prototype.saveImageGIF = function (pngFilesLocation, loopValue, delayVal
     var gifConverter = this.findGifsicle();
     if (!gifConverter) {
         dialog.createBottomMessage(4, 'Gifsicle not found. Install it with: brew install gifsicle');
-        return;
+        return false;
     }
-
-    // Create settings for conversion process
-    var convertTask = NSTask.alloc().init();
-    var createTask = NSTask.alloc().init();
-    var exportFolder = this.exportFolders.exportFolder.folderPath;
-    var tmpFolder = this.exportFolders.tempFolder.folderPath;
     
-    // Create bash command arguments
-    //var convertGifImages = "find \"" + pngFilesLocation + "\" -name '*.png' -exec sips -s format gif -o \"" + tmpFolder + "\" {}.gif {} \\;";
+    var gifsicleArgs = [];
     
-    var convertGifImages = "find \"" + pngFilesLocation + "\" -iname '*.png' -type f -exec sh -c 'sips -s format gif \"$0\" --out \"" + tmpFolder + "\"' {} \\;";
+    // Colors between 2-256 value
+    var colorsValue = parseInt(gifColors);
+    if (colorsValue >= 2 && colorsValue <= 256) gifsicleArgs.push('--colors=' + colorsValue);
     
-    var convertGifAnimation = "find \"" + tmpFolder + "\" -iname '*.gif' -execdir bash -c '\"" + gifConverter + "\"" + colorsValue + dither + optimize + loop + delay + " '*.gif' -o \"" + exportFolder + '/' + gifExportName + '.gif' + "\"' \\;";
+    if (parseInt(gifDither)) gifsicleArgs.push('--dither');
     
-    //log("AnimateMate: " + convertGifImages );
+    // Optimize levels 1-3, anything else disables optimization
+    var optimizeLevel = parseInt(gifOptimizeLevel);
+    if (optimizeLevel >= 1 && optimizeLevel <= 3) gifsicleArgs.push('-O' + optimizeLevel);
     
-    // Create GIF Image Sequence from exist PNG images
-    convertTask.setLaunchPath("/bin/bash");
-    convertTask.setArguments(["-c", convertGifImages]);
-    convertTask.launch();
-    convertTask.waitUntilExit();
-    
-    if (convertTask.terminationStatus() != 0) {
-        dialog.createBottomMessage(4, 'GIF images conversion failed');
-        return;
-    }
-
-    // Create GIF animation from converted images
-    createTask.setLaunchPath("/bin/bash");
-    createTask.setArguments(["-c", convertGifAnimation]);
-    createTask.launch();
-    createTask.waitUntilExit();
-    
-    if (createTask.terminationStatus() == 0) {
-        dialog.createBottomMessage(3, this.exportFolders.exportFolder.folderPath);
+    // Loop count: 0 = infinite. Prevent Gifsicle one extra loop round
+    var loop = parseInt(loopValue);
+    if (!loop || isNaN(loop)) {
+        gifsicleArgs.push('--loopcount=forever');
+    } else if (loop === 1) {
+        gifsicleArgs.push('--no-loopcount');
     } else {
-        dialog.createBottomMessage(4, 'GIF animation conversion failed');
-    }  
+        gifsicleArgs.push('--loopcount=' + (loop - 1));
+    }
+    
+    // Delay between frames in hundredths of a second
+    var delay = parseFloat(delayValue);
+    gifsicleArgs.push('--delay=' + (delay > 0 ? delay : 0));
+    
+    // Convert every PNG frame to GIF with sips. Arguments are passed straight to
+    // the process (no shell), so names and paths with spaces or quotes are safe.
+    var tmpFolder = NSString.stringWithString(this.exportFolders.tempFolder.folderPath);
+    for (var i = 0; i < pngFiles.length; i++) {
+        var frameName = NSString.stringWithString(pngFiles[i]).lastPathComponent().stringByDeletingPathExtension();
+        var gifFrame = String(tmpFolder.stringByAppendingPathComponent(frameName + '.gif'));
+        if (this.runTask('/usr/bin/sips', ['-s', 'format', 'gif', pngFiles[i], '--out', gifFrame]) != 0) {
+            dialog.createBottomMessage(4, 'GIF images conversion failed');
+            return false;
+        }
+        gifsicleArgs.push(gifFrame);
+    }
+    
+    // Create GIF animation from converted images
+    var exportFolder = NSString.stringWithString(this.exportFolders.exportFolder.folderPath);
+    var gifExportName = this.exportName + '_' + this.startFrameNumber + '-' + this.renderEndFrame + '.gif';
+    gifsicleArgs.push('-o', String(exportFolder.stringByAppendingPathComponent(gifExportName)));
+    
+    if (this.runTask(gifConverter, gifsicleArgs) == 0) {
+        dialog.createBottomMessage(3, this.exportFolders.exportFolder.folderPath);
+        return true;
+    }
+    dialog.createBottomMessage(4, 'GIF animation conversion failed');
+    return false;
 };
 
 
-Animate.prototype.createExportFolders = function () {
+Animate.prototype.createExportFolders = function (exportPath) {
+    
+    var fileManager = NSFileManager.defaultManager();
     
     var createNewFolder = function (setCustomPath) {
         
         var newFolderPath, uniqueString;
-        var fileManager = NSFileManager.defaultManager();
         var returnObj = {};
         
+        // Use given folder (creating it if needed)
+        if (setCustomPath && exportPath) {
+            newFolderPath = NSString.stringWithString(exportPath);
+            fileManager.createDirectoryAtPath_withIntermediateDirectories_attributes_error(newFolderPath, true, null, null);
+        }
         // Create export path dialog
-        if (setCustomPath) {
+        else if (setCustomPath) {
             newFolderPath = dialog.setExportPath();
             if (newFolderPath == -1) {
                 dialog.createBottomMessage(4, 'Export path selection canceled');
-                return false;
+                return null;
             }
         } 
         // Temporary directory if custom path is false
@@ -642,23 +658,53 @@ Animate.prototype.createExportFolders = function () {
         returnObj.folderPath = newFolderPath;
         
         // Check that export location is valid and show error if not
-        if (!returnObj.fileManager.fileExistsAtPath(newFolderPath)) {
+        if (!fileManager.fileExistsAtPath(newFolderPath)) {
             dialog.createDialogMessage(6);
             return null;
         }
         
         return returnObj;
-    }
+    };
     
-    // Update export folders to object properties
+    // Update export folders to object properties. The temporary folder is only
+    // created once there is a valid export folder.
+    this.exportFolders.tempFolder = null;
     this.exportFolders.exportFolder = createNewFolder(true);
-    this.exportFolders.tempFolder = createNewFolder();
+    if (this.exportFolders.exportFolder) {
+        this.exportFolders.tempFolder = createNewFolder(false);
+    }
+};
+
+
+Animate.prototype.removeTempFolder = function () {
+    var tempFolder = this.exportFolders.tempFolder;
+    if (tempFolder) {
+        tempFolder.fileManager.removeItemAtPath_error_(tempFolder.folderPath, null);
+        this.exportFolders.tempFolder = null;
+    }
 };
 
 
 // ---------------------------------------- //
 //                  Helpers                 //
 // ---------------------------------------- //
+
+
+// Runs an executable with an argument list (no shell) and returns its exit status.
+Animate.prototype.runTask = function (launchPath, args) {
+    var task = NSTask.alloc().init();
+    task.setLaunchPath(launchPath);
+    task.setArguments(args);
+    task.setStandardOutput(NSFileHandle.fileHandleWithNullDevice());
+    try {
+        task.launch();
+    } catch (error) {
+        log(utils.scriptName + ' could not run ' + launchPath + ' (' + error + ')');
+        return -1;
+    }
+    task.waitUntilExit();
+    return task.terminationStatus();
+};
 
 
 Animate.prototype.findGifsicle = function () {
