@@ -12,7 +12,9 @@ AnimateMate Plugin For Sketch
 
 #### "Create your animations directly in Sketch using AnimateMate."
 
-![AnimateMate - Logo Animation](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_LogoAnimation_GitHub.gif)
+![AnimateMate demo made in Sketch 2026](docs/images/demo.gif)
+
+*Made and exported with AnimateMate in Sketch 2026.3.1.*
 
 <br><br>
 
@@ -70,16 +72,22 @@ PNG sequence export works without it.
 - **Cleaner export.** No temporary folder is left behind when the export folder dialog is
   canceled, the GIF file name uses the rendered frame range, and a message confirms PNG-only
   exports.
+- **Readable dialogs in dark mode.** Field labels use the system text color instead of
+  fixed black, which was almost invisible on dark dialogs.
 - **Test harness for development** in [`dev/`](dev/README.md).
 
 
 ## How to Use
 
-There are tons of ways to use **AnimateMate** and I'll try to explain basics in this video.
+The basic workflow: add a keyframe, change the layer, add another keyframe, export.
 
-<a href="http://www.youtube.com/watch?feature=player_embedded&v=bDm_c4wPBkc
-" target="_blank"><img src="https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Basics_Video_YouTube_Thumbnail.png" 
-alt="AnimateMate Basics" /></a>
+![How to use AnimateMate](docs/images/how-to-use.gif)
+
+The original author's video walks through more of the basics (recorded with an older Sketch):
+[AnimateMate Basics on YouTube](https://www.youtube.com/watch?v=bDm_c4wPBkc).
+
+Keyframes are stored in the layer name, e.g. `Box A{:linearEase;0,20,20,80,80,360,1;20,...}`,
+so animations travel with your Sketch file.
 
 You could run into a situation when you're wondering why it's working this or that way... This plugin does not convert your **Sketch** to a fully featured animation software :) However, it'll help you in many simple cases, but if you need more complex animations you should consider some other animation tools. **AnimateMate** was made for creating simple animations at least for now, we'll see how it'll develop in the future...
 
@@ -96,10 +104,25 @@ Command               | Shortcut                              | Description
 **Export Animation**  | *`ctrl` + `option` + `cmd` +* **`A`** | Export your animation to PNG or GIF format.
 **Reverse Keyframes** | *`ctrl` + `option` + `cmd` +* **`B`** | Reverse keyframes in single or multiple animations.
 
+#### Dialogs
+
+<p>
+<img src="docs/images/dialog-create.png" alt="Create Animation dialog" width="260">
+<img src="docs/images/dialog-export.png" alt="Export Animation dialog" width="360">
+</p>
+<p>
+<img src="docs/images/dialog-random.png" alt="Random Animation dialog" width="300">
+<img src="docs/images/dialog-offset.png" alt="Offset Animation dialog" width="330">
+<img src="docs/images/dialog-edit.png" alt="Edit Animation dialog" width="300">
+</p>
+
 
 ## Examples
 
-Here are a couple examples that are made using **AnimateMate** plugin in **Sketch**. The original author's site, [AnimateMate.com](http://animatemate.com), had more info and examples.
+Here are a couple examples that are made using **AnimateMate** plugin in **Sketch**. They were made by the original author with
+earlier Sketch versions. The original author's site, [AnimateMate.com](http://animatemate.com), had more info and examples.
+
+![AnimateMate - Logo Animation](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_LogoAnimation_GitHub.gif)
 
 ![Example 1](https://github.com/isaiasmac/AnimateMate/blob/gh-pages/img/readme/AnimateMate_Example_001.gif)
 

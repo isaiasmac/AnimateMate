@@ -15,10 +15,11 @@
     { "name": "Setup Group", "identifier": "setupGroup", "script": "harness.js", "handler": "setupGroup" },
     { "name": "Mutate C", "identifier": "mutateC", "script": "harness.js", "handler": "mutateC" },
     { "name": "Animate A", "identifier": "animateA", "script": "harness.js", "handler": "animateA" },
+    { "name": "Demo Scene", "identifier": "demo", "script": "harness.js", "handler": "demo" },
     { "name": "Export Test", "identifier": "exportTest", "script": "harness.js", "handler": "exportTest" }
   ],
   "menu": {
     "title": "AMTestHarness",
-    "items": ["setup", "inspect", "probe", "selectA", "selectNone", "mutate", "setupGroup", "mutateC", "animateA", "exportTest"]
+    "items": ["setup", "inspect", "probe", "selectA", "selectNone", "mutate", "setupGroup", "mutateC", "animateA", "demo", "exportTest"]
   }
 }

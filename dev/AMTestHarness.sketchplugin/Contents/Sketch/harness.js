@@ -190,6 +190,88 @@ function animateA(context) {
   inspect(context);
 }
 
+// Builds the README demo scene (artboard "AM Demo", frames 0-60) on the test page.
+// Each layer gets its keyframes written into its name, the same format AnimateMate
+// stores: {:easing;frame,x,y,width,height,360+rotation,opacity;...}
+function demo(context) {
+  var doc = testDocument(context);
+  if (!doc) return;
+  var page = doc.selectedPage;
+  page.layers.slice().forEach(function (l) { l.remove(); });
+
+  var artboard = new sketch.Artboard({
+    name: 'AM Demo',
+    parent: page,
+    frame: { x: 0, y: 0, width: 480, height: 270 },
+    background: { enabled: true, includedInExport: true, color: '#f4f1eaff' }
+  });
+
+  function anim(easing, keys) {
+    return '{:' + easing + ';' + keys.map(function (k) { return k.join(','); }).join(';') + ';}';
+  }
+  function rect(name, x, y, w, h, color, radius) {
+    var s = new sketch.ShapePath({
+      name: name, parent: artboard,
+      shapeType: sketch.ShapePath.ShapeType.Rectangle,
+      frame: { x: x, y: y, width: w, height: h },
+      style: { fills: [color], borders: [] }
+    });
+    if (radius) s.points.forEach(function (p) { p.cornerRadius = radius; });
+    return s;
+  }
+  function oval(name, x, y, size, color) {
+    return new sketch.ShapePath({
+      name: name, parent: artboard,
+      shapeType: sketch.ShapePath.ShapeType.Oval,
+      frame: { x: x, y: y, width: size, height: size },
+      style: { fills: [color], borders: [] }
+    });
+  }
+
+  // Card slides up and fades in, holds, then fades out (loops cleanly).
+  var card = rect('Card', 120, 60, 240, 120, '#ffffff', 18);
+  card.style.shadows = [{ color: '#00000022', x: 0, y: 8, blur: 24, spread: 0 }];
+  card.name = 'Card' + anim('easeOutCubic', [
+    [0, 120, 100, 240, 120, 360, 0], [14, 120, 60, 240, 120, 360, 1],
+    [50, 120, 60, 240, 120, 360, 1], [58, 120, 60, 240, 120, 360, 0]]);
+
+  // Accent square comes in with the card, then turns 90 degrees.
+  var accent = rect('Accent', 148, 96, 48, 48, '#ff5a1f', 10);
+  accent.name = 'Accent' + anim('easeInOutCubic', [
+    [0, 148, 136, 48, 48, 360, 0], [14, 148, 96, 48, 48, 360, 1],
+    [20, 148, 96, 48, 48, 360, 1], [34, 148, 96, 48, 48, 450, 1],
+    [50, 148, 96, 48, 48, 450, 1], [58, 148, 96, 48, 48, 450, 0]]);
+
+  // Three dots arrive with the card and hop one after another.
+  var dotColors = ['#1f6feb', '#12b886', '#fab005'];
+  dotColors.forEach(function (color, i) {
+    var x = 226 + i * 34, y = 112, s = i * 4;
+    var dot = oval('Dot ' + (i + 1), x, y, 18, color);
+    dot.name = 'Dot ' + (i + 1) + anim('easeOutCubic', [
+      [0, x, y + 40, 18, 18, 360, 0], [14, x, y, 18, 18, 360, 1],
+      [18 + s, x, y, 18, 18, 360, 1], [24 + s, x, y - 18, 18, 18, 360, 1],
+      [30 + s, x, y, 18, 18, 360, 1],
+      [50, x, y, 18, 18, 360, 1], [58, x, y, 18, 18, 360, 0]]);
+  });
+
+  // Caption fades in under the card.
+  var caption = new sketch.Text({
+    name: 'Caption', parent: artboard, text: 'Made with AnimateMate',
+    frame: { x: 120, y: 202, width: 240, height: 24 },
+    style: { fontSize: 18, fontWeight: 6, textColor: '#2b2b2bff', alignment: 'center' }
+  });
+  caption.fixedWidth = true;
+  caption.frame = new sketch.Rectangle(120, 202, 240, caption.frame.height);
+  var c = caption.frame;
+  caption.name = 'Caption' + anim('easeOutCubic', [
+    [0, c.x, c.y + 10, c.width, c.height, 360, 0], [20, c.x, c.y + 10, c.width, c.height, 360, 0],
+    [30, c.x, c.y, c.width, c.height, 360, 1],
+    [50, c.x, c.y, c.width, c.height, 360, 1], [58, c.x, c.y, c.width, c.height, 360, 0]]);
+
+  select(doc, null);
+  inspect(context);
+}
+
 // Runs AnimateMate's export without dialogs. Options come from
 // dev/.harness-in.json, e.g. {"scale": 2, "gif": 1, "png": 1, "output": "/tmp/x"}.
 function exportTest(context) {

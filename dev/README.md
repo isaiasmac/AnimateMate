@@ -18,6 +18,7 @@ new document with that page, so your own files are never touched.
 dev/h.sh setup        # new document with artboard "AM Test", Box A and Box B
 dev/h.sh animateA     # writes a known 2-keyframe animation (frames 0-10) into Box A
 dev/h.sh exportTest   # runs AnimateMate's export without dialogs
+dev/h.sh demo         # builds the README demo scene (artboard "AM Demo", frames 0-58)
 dev/h.sh inspect      # prints the current page's layer tree
 ```
 
@@ -30,6 +31,9 @@ Each command prints its JSON result (also saved to `dev/.harness-out.json`).
 ```
 
 Files go to `dev/.export-out/` unless `"output"` is set.
+
+The README's `docs/images/demo.gif` is `demo` exported with
+`{"scale": 2, "gif": 1, "png": 0, "delay": 4, "loop": 0, "optimize": 3}`.
 
 Other commands: `probe` (checks the Sketch APIs AnimateMate relies on), `selectA`,
 `selectNone`, `mutate`, `setupGroup`, `mutateC`.
