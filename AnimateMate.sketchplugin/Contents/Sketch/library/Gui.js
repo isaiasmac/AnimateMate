@@ -15,7 +15,7 @@ function Gui () {
         inputHeight: 25,
         labelHeight: 20,
         fontSize: 12,
-        fontColor: '#000000',
+        fontColor: null, // null = system label color (readable in light and dark mode)
         groupLabelFontSize: 13,
         groupLabelFontColor: '#969696',
         emptyTitle: 'Title',
@@ -44,13 +44,17 @@ Gui.prototype.makeBaseDialog = function (useCancelBtn, useResetBtn) {
 Gui.prototype.makeLabel = function (text, fontSize, fontColor, bold, frameArray) {
     var text = text || this.defaults.emptyLabel;
     var fontSize = fontSize || this.defaults.fontSize;
-    var fontColor = hexToRgb(fontColor);
     var bold = bold || false;
     var frameArray = frameArray || [this.defaults.rectX, this.defaults.rectY, this.defaults.rectW, this.defaults.inputHeight];
     var frame = NSMakeRect(frameArray[0], frameArray[1], frameArray[2], frameArray[3]);
     var label = NSTextField.alloc().initWithFrame(frame);
     label.setStringValue(text);
-    label.textColor = NSColor.colorWithDeviceRed_green_blue_alpha_(fontColor[0], fontColor[1], fontColor[2], 1.0);
+    if (fontColor) {
+        var rgb = hexToRgb(fontColor);
+        label.textColor = NSColor.colorWithDeviceRed_green_blue_alpha_(rgb[0], rgb[1], rgb[2], 1.0);
+    } else {
+        label.textColor = NSColor.labelColor();
+    }
     label.setFont((bold) ? NSFont.boldSystemFontOfSize(fontSize) : NSFont.systemFontOfSize(fontSize));
     label.setEditable(false);
     label.setSelectable(false);
