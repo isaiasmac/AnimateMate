@@ -35,4 +35,7 @@ Other commands: `probe` (checks the Sketch APIs AnimateMate relies on), `selectA
 `selectNone`, `mutate`, `setupGroup`, `mutateC`.
 
 `dev/am.sh <command>` runs an AnimateMate command (e.g. `createAnimation`) in Sketch. Commands
-that open a dialog wait until you answer it in Sketch.
+that open a dialog do not show it when run this way (Sketch 2026.3.1): test those from
+**Plugins > AnimateMate** in Sketch instead.
+
+If Sketch reopens in Safe Mode after a crash, plugins are disabled until Sketch is restarted.
